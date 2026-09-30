@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Quiz Métiers ABEIP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: une colonne centrée type "fiche", l'écran change (accueil → question → résultat) sans recharger */
+:root{
+  --bg:#f3f7f5; --surface:#ffffff; --ink:#18302a; --muted:#566b64; --line:#d5e2dd;
+  --jade:#2f9a7a; --jade-deep:#1f6b55; --jade-soft:#e2f2ec; --eye:#e3b90f; --track:#e6eeeb; --on-jade:#ffffff;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1a17; --surface:#16241f; --ink:#e4efeb; --muted:#9db3ab; --line:#2a3d36;
+  --jade:#4cc39d; --jade-deep:#8fe0c4; --jade-soft:#1d3a31; --eye:#f0cb3a; --track:#233630; --on-jade:#0b1a15; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1a17; --surface:#16241f; --ink:#e4efeb; --muted:#9db3ab; --line:#2a3d36;
+  --jade:#4cc39d; --jade-deep:#8fe0c4; --jade-soft:#1d3a31; --eye:#f0cb3a; --track:#233630; --on-jade:#0b1a15; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;align-items:center;gap:12px}
+.top img{width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--line)}
+.top b{font-family:var(--display);font-size:15px;letter-spacing:.04em;display:block}
+.top span{color:var(--muted);font-size:13px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(30px,6.5vw,46px);font-weight:800}
+h1 em{font-style:normal;color:var(--jade)}
+h2{font-size:clamp(22px,4.6vw,30px);font-weight:600}
+h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+p{margin:0}
+.lead{font-size:18px;color:var(--muted);max-width:60ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--jade-soft);color:var(--jade-deep);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:500}
+.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.meta strong{color:var(--ink);font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--jade);color:var(--on-jade);border:0;border-radius:12px;padding:14px 22px;font-weight:600;font-size:17px;align-self:flex-start}
+.btn:hover{filter:brightness(1.07)}
+.ghost{background:none;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 16px;font-weight:500}
+.ghost:disabled{opacity:.35;cursor:default}
+:focus-visible{outline:3px solid var(--eye);outline-offset:2px}
+/* progression */
+.prog{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:8px;background:var(--track);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--jade);border-radius:99px;transition:width .3s}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-size:16px;display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--jade)}
+.opt .k{flex:none;width:26px;height:26px;border-radius:8px;background:var(--track);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted)}
+.opt.sel{border-color:var(--jade);background:var(--jade-soft)}
+.opt.sel .k{background:var(--jade);color:var(--surface)}
+.nav{display:flex;justify-content:space-between;gap:10px}
+/* résultat */
+.hero{border-radius:18px;padding:26px 24px;background:var(--jade-soft);display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.hero .pct{font-family:var(--display);font-weight:800;font-size:15px;color:var(--jade-deep);letter-spacing:.04em}
+.hero .tag{font-size:18px;color:var(--jade-deep);font-weight:500}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;border:14px solid var(--jade);opacity:.14}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:560px){.cols{grid-template-columns:1fr}}
+.cols>div{min-width:0;display:flex;flex-direction:column;gap:8px}
+ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.rows{display:flex;flex-direction:column;gap:9px}
+.row{display:grid;grid-template-columns:minmax(0,190px) 1fr 44px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:480px){.row{grid-template-columns:minmax(0,120px) 1fr 40px;font-size:13px}}
+.row .bar{height:10px}
+.row .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.row.top1 span:first-child{font-weight:600}
+.row:not(.top1) .bar i{background:var(--muted);opacity:.55}
+.second{border-left:4px solid var(--eye);padding-left:14px;display:flex;flex-direction:column;gap:4px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.foot{color:var(--muted);font-size:13px;text-align:center}
+.links{display:flex;flex-direction:column;gap:8px}
+.lk{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px}
+.lk a{display:inline-flex;align-items:baseline;gap:8px;color:var(--jade-deep);font-weight:500;text-decoration:none;border-bottom:1px solid transparent}
+.lk a:hover{border-bottom-color:currentColor}
+.src{flex:none;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--jade-soft);color:var(--jade-deep);border-radius:6px;padding:2px 6px}
+.more{color:var(--muted);font-size:14px}
+.second{gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.screen{animation:in .25s ease-out}
+@keyframes in{from{transform:translateY(6px)}to{transform:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <img src="data:image/webp;base64,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" alt="Logo ABEIP">
+    <div><b>ABEIP</b><span>Association Bisontine des Étudiants en Industrie Pharmaceutique</span></div>
+  </header>
+  <main id="app"></main>
+  <p class="foot">Quiz d'orientation proposé par l'ABEIP · Un résultat indicatif pour ouvrir la discussion, pas un verdict. Fiches métiers : <a href="https://imfis.fr/metiers/" target="_blank" rel="noopener" style="color:inherit">IMFIS</a> et Leem.</p>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURATION — tout le contenu modifiable est ici.
+   Pour changer une question ou un domaine, éditez simplement ces listes.
+   Les points : chaque réponse donne des points à 1 ou 2 domaines (clé: points).
+   Le score final est normalisé (score / score maximum possible du domaine),
+   donc ajouter des questions ne déséquilibre pas les résultats.
+   ===================================================================== */
+
+/* Statistiques (optionnel, version hébergée uniquement) :
+   collez l'URL "formResponse" d'un Google Form et l'identifiant du champ
+   (entry.XXXXXXX). Laissez vide pour ne rien enregistrer. */
+const STATS = {
+  formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSd4wA5-wMrYTJAn5GVoEYXGNUpF1OpS7Op0osTrDj_6SsFqXQ/formResponse",
+  entryDomain: "entry.2130367548",   /* question « Domaine » */
+  entrySecond: "entry.1125398585"    /* question « Deuxième domaine » */
+};
+
+const IMFIS = "https://imfis.fr/metiers/";
+const IMFIS_FAM = f => IMFIS + "?_categories_metier=" + f;
+
+const DOMAINS = {
+  rd: {
+    name: "R&D / Développement du médicament",
+    tag: "Concevoir le médicament de demain",
+    desc: "Tu aimes comprendre, explorer et innover. La R&D va de la découverte d'une cible et d'une molécule jusqu'à la mise au point de la forme galénique, en passant par la pharmacologie et le développement analytique.",
+    day: ["Formuler des hypothèses et concevoir des expériences", "Mettre au point des formulations et des systèmes de délivrance", "Travailler en équipe projet avec l'analytique, la production et le réglementaire"],
+    jobs: ["Chercheur·se en pharmacologie ou chimie médicinale", "Pharmacien·ne formulateur·rice", "Chef·fe de projet R&D", "Scientifique en drug delivery"],
+    path: "Filière Industrie, puis M2 en formulation, pharmacologie ou chimie selon ton affinité. Une thèse est souvent attendue pour les postes de recherche.",
+    links: [["Responsable de projet(s) R&D", IMFIS + "responsable-de-projets-rd-9/", "IMFIS"],
+            ["Chargé·e d'études cliniques", IMFIS + "charge-detudes-cliniques-20/", "IMFIS"],
+            ["Tous les métiers Recherche & Développement", IMFIS_FAM("recherche-developpement"), "IMFIS"]]
+  },
+  cq: {
+    name: "Contrôle qualité / Analytique",
+    tag: "Mesurer précisément, prouver la conformité",
+    desc: "Tu aimes la précision, les instruments et les résultats fiables. Le contrôle qualité analyse les matières premières, les produits en cours et les lots finis, et développe et valide les méthodes analytiques.",
+    day: ["Réaliser et interpréter des analyses (HPLC, dissolution, spectroscopie…)", "Développer et valider des méthodes analytiques", "Investiguer les résultats hors spécifications"],
+    jobs: ["Responsable de laboratoire de contrôle", "Pharmacien·ne contrôle qualité", "Scientifique en développement analytique", "Analyste CQ"],
+    path: "Filière Industrie et M2 orienté contrôle qualité ou analytique. Une bonne base en chimie analytique est essentielle.",
+    links: [["Responsable de laboratoire de contrôle", IMFIS + "responsable-de-laboratoire-de-controle-71/", "IMFIS"],
+            ["Tous les métiers QHSE", IMFIS_FAM("qhse"), "IMFIS"]]
+  },
+  aq: {
+    name: "Assurance qualité",
+    tag: "Garantir un système maîtrisé",
+    desc: "Tu es rigoureux·se et tu aimes que tout soit conforme et maîtrisé. L'assurance qualité fait vivre le système qualité (BPF, déviations, CAPA, audits, validation) jusqu'à la libération des lots.",
+    day: ["Traiter des déviations et conduire des enquêtes de cause racine", "Rédiger et faire appliquer les procédures", "Préparer et mener des audits et des inspections"],
+    jobs: ["Pharmacien·ne assurance qualité", "Responsable validation / qualification", "Auditeur·rice BPF", "Pharmacien·ne libérateur·rice de lots"],
+    path: "Filière Industrie et M2 qualité. C'est l'un des domaines qui recrutent le plus de pharmacien·nes en sortie d'études.",
+    links: [["Responsable de l'assurance qualité", IMFIS + "responsable-de-lassurance-qualite-66/", "IMFIS"],
+            ["Responsable de validation / qualification", IMFIS + "responsable-de-validation-qualification-67/", "IMFIS"],
+            ["Tous les métiers QHSE", IMFIS_FAM("qhse"), "IMFIS"]]
+  },
+  prod: {
+    name: "Production / Industrialisation",
+    tag: "Passer du labo à l'échelle industrielle",
+    desc: "Tu aimes le concret, les équipements et voir le résultat de ton travail. La production et l'industrialisation transforment un produit développé au laboratoire en fabrication à grande échelle, conforme aux BPF.",
+    day: ["Piloter des lignes de fabrication et encadrer une équipe", "Mener des transferts industriels et des changements d'échelle", "Optimiser les procédés grâce aux données et à l'amélioration continue"],
+    jobs: ["Pharmacien·ne responsable de production", "Ingénieur·e procédés", "Chargé·e de développement industriel", "Chef·fe d'atelier"],
+    path: "Filière Industrie, M2 production ou génie des procédés, et des stages sur site. Une formation lean / six sigma est un vrai plus.",
+    links: [["Chargé·e de développement industriel / méthodes", IMFIS + "chargee-de-developpement-industriel-methodes-34/", "IMFIS"],
+            ["Tous les métiers Production", IMFIS_FAM("production"), "IMFIS"]]
+  },
+  reg: {
+    name: "Affaires réglementaires",
+    tag: "Obtenir et maintenir l'autorisation",
+    desc: "Tu aimes les textes, la stratégie et les dossiers bien construits. Les affaires réglementaires préparent et font vivre les dossiers d'AMM (format CTD) et dialoguent avec les autorités : ANSM, EMA, FDA.",
+    day: ["Rédiger et compiler les modules du dossier d'AMM", "Gérer les variations tout au long de la vie du produit", "Faire de la veille et conseiller les équipes projet"],
+    jobs: ["Chargé·e d'affaires réglementaires", "Spécialiste réglementaire CMC", "Regulatory project manager", "Responsable des affaires réglementaires"],
+    path: "Filière Industrie et M2 affaires réglementaires. Un bon niveau d'anglais est indispensable.",
+    links: [["Chargé·e des affaires réglementaires (fiche PDF)", "https://www.leem.org/sites/default/files/2023-03/Charg%C3%A9%20des%20affaires%20r%C3%A9glementaires.pdf", "Leem"],
+            ["Responsable des affaires réglementaires (fiche PDF)", "https://www.leem.org/sites/default/files/2023-03/Responsable%20des%20affaires%20r%C3%A9glementaires.pdf", "Leem"],
+            ["Tous les métiers Réglementaire & Vigilance", IMFIS_FAM("reglementaire-vigilance"), "IMFIS"]]
+  },
+  pv: {
+    name: "Pharmacovigilance / Sécurité",
+    tag: "Veiller sur le patient après l'AMM",
+    desc: "Tu tiens avant tout à la sécurité du patient. La pharmacovigilance collecte et analyse les effets indésirables, détecte les signaux et réévalue en continu le rapport bénéfice/risque des médicaments.",
+    day: ["Analyser des cas d'effets indésirables", "Détecter et évaluer des signaux de sécurité", "Rédiger les rapports périodiques de sécurité (PSUR / PBRER)"],
+    jobs: ["Chargé·e de pharmacovigilance", "Responsable de pharmacovigilance", "Drug safety physician / scientist", "Chargé·e d'information médicale"],
+    path: "Une base solide en pharmacologie et thérapeutique, et un M2 en pharmacovigilance ou pharmacologie. L'expérience hospitalière est valorisée.",
+    links: [["Chargé·e de pharmacovigilance (fiche PDF)", "https://leem.org/sites/default/files/2024-07/Charge%20de%20pharmacovigilance.pdf", "Leem"],
+            ["Responsable de pharmacovigilance (fiche PDF)", "https://www.leem.org/sites/default/files/2023-03/Responsable%20de%20pharmacovigilance.pdf", "Leem"],
+            ["Tous les métiers Réglementaire & Vigilance", IMFIS_FAM("reglementaire-vigilance"), "IMFIS"]]
+  },
+  data: {
+    name: "Data / Digital / Biostatistiques",
+    tag: "Faire parler les données de santé",
+    desc: "Tu aimes les données, la modélisation et les outils numériques. Ces métiers analysent les données d'essais cliniques, de production ou de vie réelle et construisent des modèles pour éclairer les décisions.",
+    day: ["Concevoir des plans d'analyse statistique", "Construire des modèles prédictifs", "Gérer et fiabiliser de grandes bases de données"],
+    jobs: ["Biostatisticien·ne", "Data scientist santé", "Bio-informaticien·ne", "Data manager clinique"],
+    path: "M2 en biostatistiques, bio-informatique ou data science appliquée à la santé. Les compétences en programmation (R, Python, SAS) sont décisives.",
+    links: [["Bio-informaticien·ne", IMFIS + "bio-informaticien-3/", "IMFIS"],
+            ["Responsable biométrie", IMFIS + "responsable-biometrie-27/", "IMFIS"],
+            ["Gestionnaire de bases de données biomédicales", IMFIS + "gestionnaire-de-bases-de-donnees-biomedicales-24/", "IMFIS"]]
+  },
+  mkt: {
+    name: "Marketing / Market Access / HEOR",
+    tag: "Donner au médicament sa place",
+    desc: "Tu aimes la stratégie, les chiffres et le marché. Le marketing construit le positionnement du produit ; l'accès au marché et l'économie de la santé (HEOR) démontrent sa valeur pour obtenir prix et remboursement.",
+    day: ["Analyser le marché et la concurrence", "Préparer le lancement et le positionnement d'un produit", "Construire des dossiers médico-économiques et de remboursement"],
+    jobs: ["Chef·fe de produit", "Market access manager", "Responsable des études pharmaco-économiques", "Chargé·e d'études marketing"],
+    path: "M2 marketing pharmaceutique, market access ou économie de la santé, parfois complété par une école de commerce.",
+    links: [["Responsable des études pharmaco-économiques", IMFIS + "responsable-des-etudes-pharmaco-economiques-119/", "IMFIS"],
+            ["Chargé·e d'études marketing", IMFIS + "charge-detudes-marketing-107/", "IMFIS"],
+            ["Responsable des études de marché", IMFIS + "responsable-des-etudes-de-marche-114/", "IMFIS"]]
+  },
+  bd: {
+    name: "Business Development / Commercial",
+    tag: "Créer des opportunités et des partenariats",
+    desc: "Tu aimes le contact, la négociation et faire émerger des projets. Le business development identifie et négocie les partenariats (licences, biotechs, acquisitions) ; les fonctions commerciales développent la relation avec les clients.",
+    day: ["Identifier et évaluer des opportunités de partenariat", "Négocier des accords et des contrats", "Développer un réseau de clients et de partenaires"],
+    jobs: ["Business developer", "Responsable licensing / alliances", "Key account manager", "Directeur·rice commercial·e"],
+    path: "Une double compétence science + business : M2 management de la santé ou école de commerce. L'anglais et le réseau comptent beaucoup.",
+    links: [["Directeur·rice commercial·e", IMFIS + "directeur-commercial-83/", "IMFIS"],
+            ["Chargé·e de clientèle", IMFIS + "charge-de-clientele-105/", "IMFIS"],
+            ["Tous les métiers Commercialisation & Diffusion", IMFIS_FAM("commercialisation-diffusion"), "IMFIS"]]
+  },
+  distrib: {
+    name: "Distribution pharmaceutique / Grossiste-répartiteur",
+    tag: "Le bon médicament, au bon endroit, au bon moment",
+    desc: "Tu aimes organiser, anticiper et gérer les flux. La distribution et la répartition pharmaceutique approvisionnent les pharmacies et les hôpitaux, gèrent les stocks et garantissent les bonnes conditions de conservation et de transport.",
+    day: ["Optimiser les stocks et les flux de produits", "Garantir le respect des bonnes pratiques de distribution", "Réagir vite en cas de rupture d'approvisionnement"],
+    jobs: ["Pharmacien·ne responsable (grossiste-répartiteur, dépositaire)", "Responsable supply chain", "Responsable logistique", "Supply planner"],
+    path: "Filière Industrie ou Officine, puis M2 supply chain, logistique ou distribution pharmaceutique.",
+    links: [["Responsable supply chain (fiche PDF)", "https://leem.org/sites/default/files/2024-07/Responsable%20supply%20chain.pdf", "Leem"],
+            ["Responsable logistique (fiche PDF)", "https://www.leem.org/sites/default/files/2023-04/Responsable%20logistique.pdf", "Leem"],
+            ["Tous les métiers Commercialisation & Diffusion", IMFIS_FAM("commercialisation-diffusion"), "IMFIS"]]
+  }
+};
+
+
+
+/* Chaque réponse : [texte, {domaine: points}] */
+const QUESTIONS = [
+  { t: "Ton projet idéal", q: "Tu dois participer au développement d'un nouveau médicament. Quelle partie du projet t'attire spontanément le plus ?", a: [
+    ["Comprendre son mécanisme d'action et identifier de nouvelles pistes scientifiques.", {rd:2}],
+    ["Déterminer comment optimiser sa formulation et son administration.", {rd:2}],
+    ["Mettre au point des méthodes pour mesurer précisément le médicament.", {cq:2}],
+    ["Organiser sa fabrication à grande échelle.", {prod:2}],
+    ["Évaluer sa sécurité et identifier d'éventuels risques.", {pv:2}] ]},
+  { t: "Face à un problème", q: "Un résultat expérimental est complètement différent de ce que tu attendais. Tu…", a: [
+    ["Cherches à comprendre scientifiquement pourquoi.", {rd:2}],
+    ["Vérifies d'abord les données et la méthode utilisée.", {cq:1, data:1}],
+    ["Regardes si une procédure n'a pas été respectée.", {aq:2}],
+    ["Cherches si un paramètre du procédé de fabrication peut expliquer le problème.", {prod:2}],
+    ["Te demandes quelles pourraient être les conséquences pour le produit ou le patient.", {pv:1, aq:1}] ]},
+  { t: "Ton environnement de travail", q: "Dans quelle journée te reconnais-tu le plus ?", a: [
+    ["🧪 Laboratoire : expériences, analyses et interprétation des résultats.", {rd:1, cq:1}],
+    ["💻 Ordinateur : données, statistiques, modélisation et recherche d'informations.", {data:2}],
+    ["🏭 Site industriel : équipements, procédés et résolution de problèmes.", {prod:2}],
+    ["📋 Bureau : dossiers, réglementation, procédures et documentation.", {reg:1, aq:1}],
+    ["🤝 Réunions : échanges avec des équipes, partenaires ou clients.", {bd:2, mkt:1}],
+    ["🚚 Plateforme logistique : stocks, commandes et approvisionnements.", {distrib:2}] ]},
+  { t: "Ton type de problème préféré", q: "Lequel de ces problèmes aimerais-tu résoudre ?", a: [
+    ["Pourquoi cette molécule agit-elle sur cette cible ?", {rd:2}],
+    ["Comment faire parvenir efficacement cette molécule à son site d'action ?", {rd:2}],
+    ["Comment garantir que chaque lot possède exactement les caractéristiques attendues ?", {cq:1, aq:1}],
+    ["Comment produire ce médicament plus efficacement à grande échelle ?", {prod:2}],
+    ["Comment s'assurer que son utilisation reste sûre après sa commercialisation ?", {pv:2}] ]},
+  { t: "Ton rapport à l'innovation", q: "On te donne un budget pour développer une nouvelle technologie pharmaceutique. Tu voudrais…", a: [
+    ["Développer un système de suivi des médicaments tout au long de la chaîne d'approvisionnement (traçabilité, chaîne du froid).", {distrib:2, aq:1}],
+    ["Développer une nouvelle formulation ou un nouveau système de délivrance.", {rd:2}],
+    ["Développer une nouvelle méthode d'analyse ou d'exploitation des données.", {cq:1, data:1}],
+    ["Automatiser ou améliorer un procédé industriel.", {prod:2}],
+    ["Développer un nouvel outil permettant de mieux détecter les risques liés aux médicaments.", {pv:1, data:1}] ]},
+  { t: "Les données", q: "Tu récupères un énorme jeu de données provenant d'un projet pharmaceutique. Quelle partie t'intéresse le plus ?", a: [
+    ["Anticiper la demande pour éviter les ruptures de stock.", {distrib:2, data:1}],
+    ["Étudier les paramètres qui influencent la formulation ou le comportement du médicament.", {rd:2}],
+    ["Vérifier la fiabilité et la reproductibilité des résultats analytiques.", {cq:2}],
+    ["Utiliser les données pour optimiser un procédé.", {prod:1, data:1}],
+    ["Développer un modèle statistique ou informatique permettant de prédire quelque chose.", {data:2}] ]},
+  { t: "Une nouvelle réglementation", q: "Une nouvelle réglementation va modifier les pratiques de ton entreprise. Quelle partie de la situation t'intéresse le plus ?", a: [
+    ["Adapter le stockage et le transport des produits aux nouvelles exigences.", {distrib:2, aq:1}],
+    ["Déterminer concrètement comment adapter les procédés.", {prod:2}],
+    ["Analyser les exigences et construire le dossier nécessaire.", {reg:2}],
+    ["Mettre à jour les procédures et garantir leur application.", {aq:2}],
+    ["Évaluer l'impact de ces changements sur les produits déjà commercialisés.", {reg:1, pv:1}] ]},
+  { t: "Le travail en équipe", q: "Tu préfères travailler dans une équipe où…", a: [
+    ["Chacun est très spécialisé et travaille sur une problématique scientifique précise.", {rd:1, data:1, cq:1}],
+    ["Les équipes sont très pluridisciplinaires et travaillent sur un même projet.", {reg:1, mkt:1}],
+    ["Tu coordonnes plusieurs équipes autour d'un objectif industriel.", {prod:2, distrib:1}],
+    ["Tu échanges régulièrement avec des autorités, des experts ou des partenaires externes.", {reg:2, pv:1}],
+    ["Tu es souvent en contact avec des clients ou des interlocuteurs commerciaux.", {bd:2, mkt:1}] ]},
+  { t: "Ta satisfaction professionnelle", q: "À la fin d'un projet, qu'est-ce qui te rendrait le plus fier / fière ?", a: [
+    ["Avoir découvert quelque chose de nouveau.", {rd:2}],
+    ["Avoir développé une solution technique qui fonctionne.", {prod:2}],
+    ["Avoir rendu un processus plus fiable et maîtrisé.", {aq:2, cq:1}],
+    ["Avoir permis à un produit d'arriver jusqu'au patient.", {distrib:2, reg:1}],
+    ["Avoir contribué à une décision stratégique importante.", {mkt:2, bd:1}] ]},
+  { t: "Ton rapport aux règles", q: "Quelle phrase te correspond le mieux ?", a: [
+    ["« J'aime avoir de la liberté pour explorer différentes solutions. »", {rd:1, data:1}],
+    ["« J'aime quand les choses sont structurées et clairement définies. »", {aq:1, reg:1}],
+    ["« J'aime vérifier que tout est conforme et maîtrisé. »", {cq:1, aq:1}],
+    ["« Les règles sont intéressantes lorsqu'elles permettent de garantir la sécurité du patient. »", {pv:2}],
+    ["« Je préfère avoir des objectifs clairs mais pouvoir décider comment les atteindre. »", {bd:1, mkt:1}] ]},
+  { t: "Le médicament est commercialisé", q: "Le médicament est maintenant disponible pour les patients. Quelle mission t'intéresserait le plus ?", a: [
+    ["Continuer à étudier son efficacité et son comportement chez les patients.", {rd:1, data:1}],
+    ["Surveiller les effets indésirables et rechercher d'éventuels signaux de sécurité.", {pv:2}],
+    ["Suivre les données scientifiques et réglementaires pour maintenir son autorisation.", {reg:2}],
+    ["Analyser son utilisation et son impact économique dans le système de santé.", {mkt:2}],
+    ["Développer sa stratégie commerciale et son positionnement.", {bd:2, mkt:1}] ]},
+  { t: "Le produit doit être distribué", q: "Un médicament doit être livré dans des centaines de pharmacies. Quelle problématique t'intéresse le plus ?", a: [
+    ["Optimiser les stocks et les flux de produits.", {distrib:2}],
+    ["Garantir le respect des conditions de conservation et de transport.", {aq:1, cq:1}],
+    ["Organiser efficacement les commandes et les approvisionnements.", {distrib:2}],
+    ["Développer les relations avec les pharmacies et les laboratoires.", {bd:2, distrib:1}],
+    ["Analyser les données de distribution pour optimiser le système.", {data:2}] ]},
+  { t: "Une nouvelle technologie arrive", q: "Une biotech développe une technologie très prometteuse. Ton entreprise envisage de travailler avec elle. Quelle mission t'attire le plus ?", a: [
+    ["Évaluer scientifiquement la technologie.", {rd:2}],
+    ["Étudier les données disponibles et son potentiel.", {data:2}],
+    ["Négocier les conditions du partenariat.", {bd:2}],
+    ["Évaluer son intérêt économique et stratégique.", {mkt:1, bd:1}],
+    ["Déterminer les implications réglementaires et scientifiques du projet.", {reg:2}] ]},
+  { t: "Le lancement d'un médicament", q: "Ton entreprise prépare le lancement d'un nouveau médicament. Quelle mission te semble la plus intéressante ?", a: [
+    ["Mettre en place le suivi de sa sécurité dès sa mise sur le marché (plan de gestion des risques).", {pv:2, reg:1}],
+    ["Déterminer comment positionner le médicament face à ses concurrents.", {mkt:2}],
+    ["Étudier les données médico-économiques et l'impact sur le système de santé.", {mkt:1, data:1}],
+    ["Préparer les éléments nécessaires à son accès au marché.", {mkt:1, reg:1}],
+    ["Développer les relations avec les partenaires et les différents acteurs.", {bd:2}],
+    ["Vérifier la conformité des premiers lots commerciaux avant leur libération.", {cq:2, aq:1}] ]},
+  { t: "La question finale", q: "Imagine ton futur professionnel. Quelle phrase te correspond le plus ?", a: [
+    ["🔬 « Je veux participer à la découverte et au développement des médicaments de demain. »", {rd:3}],
+    ["🧪 « Je veux garantir que les médicaments produits sont fiables, conformes et de qualité. »", {cq:2, aq:2}],
+    ["🏭 « Je veux transformer un produit développé au laboratoire en production industrielle. »", {prod:3}],
+    ["⚖️ « Je veux contribuer à ce que les médicaments puissent être développés et commercialisés dans le respect des exigences. »", {reg:3}],
+    ["🛡️ « Je veux contribuer à garantir la sécurité des médicaments pour les patients. »", {pv:3}],
+    ["💻 « Je veux utiliser les données et les technologies pour améliorer les décisions en santé. »", {data:3}],
+    ["📈 « Je veux comprendre le marché et contribuer aux décisions stratégiques autour des médicaments. »", {mkt:3}],
+    ["🤝 « Je veux développer des collaborations et faire émerger de nouvelles opportunités. »", {bd:3}],
+    ["🚚 « Je veux faire en sorte que les médicaments arrivent efficacement là où ils sont nécessaires. »", {distrib:3}] ]}
+];
+
+/* ====================== moteur du quiz (pas besoin d'y toucher) ====================== */
+const KEYS = Object.keys(DOMAINS);
+const MAX = Object.fromEntries(KEYS.map(k => [k, QUESTIONS.reduce((s, qu) => s + Math.max(0, ...qu.a.map(o => o[1][k] || 0)), 0)]));
+/* Dénominateur plancher : un domaine couvert par peu de questions ne doit pas monter trop facilement à 100 %. */
+const FLOOR = 14;
+const DEN = Object.fromEntries(KEYS.map(k => [k, Math.max(MAX[k], FLOOR)]));
+const app = document.getElementById("app");
+let answers = [], idx = 0, orders = [], sent = false;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function shuffle(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function intro(){
+  app.innerHTML = `<section class="screen card">
+    <h1>Quel métier de l'industrie pharma <em>est fait pour toi&nbsp;?</em></h1>
+    <p class="lead">Réponds à ${QUESTIONS.length} questions sur tes goûts, ta façon de travailler et ce qui te motive. On te dit vers quel domaine de l'industrie tu pourrais te diriger, et quels métiers y chercher.</p>
+    <div class="meta"><span><strong>${QUESTIONS.length}</strong> questions</span><span><strong>~4</strong> minutes</span><span><strong>${KEYS.length}</strong> domaines</span></div>
+    <div class="chips">${KEYS.map(k => `<span class="chip">${esc(DOMAINS[k].name)}</span>`).join("")}</div>
+    <button class="btn" id="go">Commencer le quiz</button>
+  </section>`;
+  document.getElementById("go").onclick = () => { answers = []; idx = 0; orders = QUESTIONS.map(qu => shuffle(qu.a.length)); sent = false; question(); };
+}
+
+function question(){
+  const qu = QUESTIONS[idx], sel = answers[idx];
+  app.innerHTML = `<section class="screen card">
+    <div class="prog"><span>Question ${idx+1} / ${QUESTIONS.length}</span><div class="bar"><i style="width:${(idx/QUESTIONS.length)*100}%"></i></div></div>
+    ${qu.t ? `<h3>${esc(qu.t)}</h3>` : ""}
+    <h2>${esc(qu.q)}</h2>
+    <div class="opts">${orders[idx].map((oi, n) => `<button class="opt${sel===oi?" sel":""}" data-i="${oi}"><span class="k">${"ABCDEFGHIJ"[n]}</span><span>${esc(qu.a[oi][0])}</span></button>`).join("")}</div>
+    <div class="nav"><button class="ghost" id="back" ${idx===0?"disabled":""}>← Précédente</button></div>
+  </section>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    answers[idx] = +b.dataset.i;
+    b.classList.add("sel");
+    setTimeout(() => { idx++; idx < QUESTIONS.length ? question() : result(); }, 180);
+  });
+  document.getElementById("back").onclick = () => { if (idx > 0) { idx--; question(); } };
+  app.querySelector(".opt")?.focus({preventScroll:true});
+}
+
+function score(){
+  const raw = Object.fromEntries(KEYS.map(k => [k, 0]));
+  answers.forEach((oi, qi) => { const o = QUESTIONS[qi].a[oi]; for (const k in o[1]) raw[k] += o[1][k]; });
+  return KEYS.map(k => ({k, pct: DEN[k] ? Math.round(100 * raw[k] / DEN[k]) : 0, raw: raw[k]}))
+             .sort((a, b) => b.pct - a.pct || b.raw - a.raw);
+}
+
+function result(){
+  const s = score(), d = DOMAINS[s[0].k], d2 = DOMAINS[s[1].k];
+  const hybrid = s[0].pct - s[1].pct <= 8;
+  if (!sent) { sent = true; sendStats(s[0].k, s[1].k); }
+  app.innerHTML = `<section class="screen" style="display:flex;flex-direction:column;gap:18px">
+    <div class="hero">
+      <span class="pct">TON DOMAINE · ${s[0].pct}&nbsp;% DE CORRESPONDANCE</span>
+      <h1>${esc(d.name)}</h1>
+      <p class="tag">${esc(d.tag)}</p>
+    </div>
+    <div class="card">
+      <p>${esc(d.desc)}</p>
+      <div class="cols">
+        <div><h3>Au quotidien</h3><ul>${d.day.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+        <div><h3>Métiers à explorer</h3><ul>${d.jobs.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px"><h3>Pour y aller</h3><p>${esc(d.path)}</p></div>
+      ${links(d)}
+    </div>
+    <div class="card">
+      <div class="second">
+        <h3>${hybrid ? "Profil hybride : ton deuxième domaine est très proche" : "Ton deuxième domaine"}</h3>
+        <p><strong>${esc(d2.name)}</strong> (${s[1].pct}&nbsp;%) · ${esc(d2.tag)}</p>
+        <p class="more">Métiers : ${esc(d2.jobs.slice(0, 3).join(" · "))}</p>
+        ${links(d2, true)}
+      </div>
+      <h3>Ton profil complet</h3>
+      <div class="rows">${s.map((r, i) => `<div class="row${i===0?" top1":""}"><span>${esc(DOMAINS[r.k].name)}</span><div class="bar"><i style="width:${r.pct}%"></i></div><span class="v">${r.pct}&nbsp;%</span></div>`).join("")}</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="again">Refaire le quiz</button>
+      <button class="ghost" id="review">Revoir mes réponses</button>
+    </div>
+  </section>`;
+  document.getElementById("again").onclick = intro;
+  document.getElementById("review").onclick = () => { idx = 0; question(); };
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function links(d, compact){
+  if (!d.links || !d.links.length) return "";
+  const list = compact ? d.links.slice(0, 2) : d.links;
+  return `<div class="links">${compact ? "" : "<h3>Fiches métiers officielles</h3>"}
+    <ul class="lk">${list.map(([label, url, src]) => `<li><a href="${esc(url)}" target="_blank" rel="noopener"><span class="src">${esc(src)}</span>${esc(label)}<span aria-hidden="true"> ↗</span></a></li>`).join("")}</ul></div>`;
+}
+
+function sendStats(k1, k2){
+  if (!STATS.formUrl || !STATS.entryDomain) return;
+  try {
+    const body = new URLSearchParams();
+    body.append(STATS.entryDomain, DOMAINS[k1].name);
+    if (STATS.entrySecond) body.append(STATS.entrySecond, DOMAINS[k2].name);
+    fetch(STATS.formUrl, {method:"POST", mode:"no-cors", body}).catch(() => {});
+  } catch (e) {}
+}
+
+intro();
+</script>
+
+</body>
+</html>
