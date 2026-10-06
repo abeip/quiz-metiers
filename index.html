@@ -112,9 +112,11 @@ ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
    collez l'URL "formResponse" d'un Google Form et l'identifiant du champ
    (entry.XXXXXXX). Laissez vide pour ne rien enregistrer. */
 const STATS = {
-  formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSd4wA5-wMrYTJAn5GVoEYXGNUpF1OpS7Op0osTrDj_6SsFqXQ/formResponse",
-  entryDomain: "entry.2130367548",   /* question « Domaine » */
-  entrySecond: "entry.1125398585"    /* question « Deuxième domaine » */
+  formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSdoGTg8c_cd7szkPUjBh5MHohCDyHZzr_Xeh_yHdnn-vUZcvw/formResponse",
+  entryDomain: "entry.1379374601",   /* question « Domaine » */
+  entrySecond: "entry.936071545",   /* question « Deuxième domaine » */
+  entryPct: "entry.589369224",                      /* question « Pourcentage » (du 1er domaine) : collez ici entry.XXXXXXX */
+  entrySecondPct: "entry.1582578799"                 /* facultatif : question « Pourcentage 2e domaine » */
 };
 
 const IMFIS = "https://imfis.fr/metiers/";
@@ -197,9 +199,9 @@ const DOMAINS = {
             ["Gestionnaire de bases de données biomédicales", IMFIS + "gestionnaire-de-bases-de-donnees-biomedicales-24/", "IMFIS"]]
   },
   mkt: {
-    name: "Marketing / Market Access / HEOR",
+    name: "Marketing / Market Access",
     tag: "Donner au médicament sa place",
-    desc: "Tu aimes la stratégie, les chiffres et le marché. Le marketing construit le positionnement du produit ; l'accès au marché et l'économie de la santé (HEOR) démontrent sa valeur pour obtenir prix et remboursement.",
+    desc: "Tu aimes la stratégie, les chiffres et le marché. Le marketing construit le positionnement du produit ; l'accès au marché et l'économie de la santé démontrent sa valeur pour obtenir prix et remboursement.",
     day: ["Analyser le marché et la concurrence", "Préparer le lancement et le positionnement d'un produit", "Construire des dossiers médico-économiques et de remboursement"],
     jobs: ["Chef·fe de produit", "Market access manager", "Responsable des études pharmaco-économiques", "Chargé·e d'études marketing"],
     path: "M2 marketing pharmaceutique, market access ou économie de la santé, parfois complété par une école de commerce.",
@@ -242,46 +244,45 @@ const QUESTIONS = [
     ["Organiser sa fabrication à grande échelle.", {prod:2}],
     ["Évaluer sa sécurité et identifier d'éventuels risques.", {pv:2}] ]},
   { t: "Face à un problème", q: "Un résultat expérimental est complètement différent de ce que tu attendais. Tu…", a: [
-    ["Cherches à comprendre scientifiquement pourquoi.", {rd:2}],
-    ["Vérifies d'abord les données et la méthode utilisée.", {cq:1, data:1}],
+    ["Recommences car une erreur a été faite.", {cq:2}],
+    ["Vérifies d'abord les données et la méthode utilisée.", {rd:2, data:1}],
     ["Regardes si une procédure n'a pas été respectée.", {aq:2}],
     ["Cherches si un paramètre du procédé de fabrication peut expliquer le problème.", {prod:2}],
     ["Te demandes quelles pourraient être les conséquences pour le produit ou le patient.", {pv:1, aq:1}] ]},
   { t: "Ton environnement de travail", q: "Dans quelle journée te reconnais-tu le plus ?", a: [
     ["🧪 Laboratoire : expériences, analyses et interprétation des résultats.", {rd:1, cq:1}],
-    ["💻 Ordinateur : données, statistiques, modélisation et recherche d'informations.", {data:2}],
-    ["🏭 Site industriel : équipements, procédés et résolution de problèmes.", {prod:2}],
-    ["📋 Bureau : dossiers, réglementation, procédures et documentation.", {reg:1, aq:1}],
-    ["🤝 Réunions : échanges avec des équipes, partenaires ou clients.", {bd:2, mkt:1}],
-    ["🚚 Plateforme logistique : stocks, commandes et approvisionnements.", {distrib:2}] ]},
+    ["🏭 équipement industriel : équipements, procédés et résolution de problèmes.", {prod:2}],
+    ["📋  dossiers, réglementation, procédures et documentation.", {reg:1, aq:1}],
+    ["🤝 Négocier : échanges avec des équipes, partenaires ou clients.", {bd:2, mkt:1}],
+    ["🚚 Plateforme logistique : stocks, commandes, envois et approvisionnements.", {distrib:2}] ]},
   { t: "Ton type de problème préféré", q: "Lequel de ces problèmes aimerais-tu résoudre ?", a: [
     ["Pourquoi cette molécule agit-elle sur cette cible ?", {rd:2}],
-    ["Comment faire parvenir efficacement cette molécule à son site d'action ?", {rd:2}],
+    ["Comment faire connaitre le médicament au près des professionnels de santé?", {mkt:2}],
     ["Comment garantir que chaque lot possède exactement les caractéristiques attendues ?", {cq:1, aq:1}],
     ["Comment produire ce médicament plus efficacement à grande échelle ?", {prod:2}],
-    ["Comment s'assurer que son utilisation reste sûre après sa commercialisation ?", {pv:2}] ]},
-  { t: "Ton rapport à l'innovation", q: "On te donne un budget pour développer une nouvelle technologie pharmaceutique. Tu voudrais…", a: [
-    ["Développer un système de suivi des médicaments tout au long de la chaîne d'approvisionnement (traçabilité, chaîne du froid).", {distrib:2, aq:1}],
-    ["Développer une nouvelle formulation ou un nouveau système de délivrance.", {rd:2}],
-    ["Développer une nouvelle méthode d'analyse ou d'exploitation des données.", {cq:1, data:1}],
-    ["Automatiser ou améliorer un procédé industriel.", {prod:2}],
-    ["Développer un nouvel outil permettant de mieux détecter les risques liés aux médicaments.", {pv:1, data:1}] ]},
+    ["Comment s'assurer que tout le monde peut utiliser le médicament ?", {pv:2}] ]},
+  { t: "Ton rapport à l'innovation", q: "On te donne un budget pour développer une nouvelle technologie pharmaceutique. Dans quel secteur tu souhaiterais investir ?", a: [
+    ["Distribution.", {distrib:2}],
+    ["Recherche & Développement", {rd:2}],
+    ["Contrôle Qualité", {cq:2}],
+    ["Production", {prod:2}],
+    ["Commercialisation & Marketing.", {mkt:2, bd:2}] ]},
   { t: "Les données", q: "Tu récupères un énorme jeu de données provenant d'un projet pharmaceutique. Quelle partie t'intéresse le plus ?", a: [
     ["Anticiper la demande pour éviter les ruptures de stock.", {distrib:2, data:1}],
     ["Étudier les paramètres qui influencent la formulation ou le comportement du médicament.", {rd:2}],
     ["Vérifier la fiabilité et la reproductibilité des résultats analytiques.", {cq:2}],
     ["Utiliser les données pour optimiser un procédé.", {prod:1, data:1}],
     ["Développer un modèle statistique ou informatique permettant de prédire quelque chose.", {data:2}] ]},
-  { t: "Une nouvelle réglementation", q: "Une nouvelle réglementation va modifier les pratiques de ton entreprise. Quelle partie de la situation t'intéresse le plus ?", a: [
+  { t: "Une nouvelle réglementation", q: "Une nouvelle réglementation va modifier les pratiques de ton entreprise. Dans quel domaine tu veux t'investir ?", a: [
     ["Adapter le stockage et le transport des produits aux nouvelles exigences.", {distrib:2, aq:1}],
-    ["Déterminer concrètement comment adapter les procédés.", {prod:2}],
+    ["Comment adapter les réglementations sur le terrain.", {prod:2}],
     ["Analyser les exigences et construire le dossier nécessaire.", {reg:2}],
     ["Mettre à jour les procédures et garantir leur application.", {aq:2}],
     ["Évaluer l'impact de ces changements sur les produits déjà commercialisés.", {reg:1, pv:1}] ]},
   { t: "Le travail en équipe", q: "Tu préfères travailler dans une équipe où…", a: [
-    ["Chacun est très spécialisé et travaille sur une problématique scientifique précise.", {rd:1, data:1, cq:1}],
+    ["Chacun est très spécialisé et travaille sur une problématique scientifique précise.", {rd:1, cq:1}],
     ["Les équipes sont très pluridisciplinaires et travaillent sur un même projet.", {reg:1, mkt:1}],
-    ["Tu coordonnes plusieurs équipes autour d'un objectif industriel.", {prod:2, distrib:1}],
+    ["Tu coordonnes plusieurs équipes autour d'un objectif de production.", {prod:2}],
     ["Tu échanges régulièrement avec des autorités, des experts ou des partenaires externes.", {reg:2, pv:1}],
     ["Tu es souvent en contact avec des clients ou des interlocuteurs commerciaux.", {bd:2, mkt:1}] ]},
   { t: "Ta satisfaction professionnelle", q: "À la fin d'un projet, qu'est-ce qui te rendrait le plus fier / fière ?", a: [
@@ -291,26 +292,26 @@ const QUESTIONS = [
     ["Avoir permis à un produit d'arriver jusqu'au patient.", {distrib:2, reg:1}],
     ["Avoir contribué à une décision stratégique importante.", {mkt:2, bd:1}] ]},
   { t: "Ton rapport aux règles", q: "Quelle phrase te correspond le mieux ?", a: [
-    ["« J'aime avoir de la liberté pour explorer différentes solutions. »", {rd:1, data:1}],
+    ["« J'aime avoir de la liberté pour explorer différentes solutions. »", {rd:2}],
     ["« J'aime quand les choses sont structurées et clairement définies. »", {aq:1, reg:1}],
     ["« J'aime vérifier que tout est conforme et maîtrisé. »", {cq:1, aq:1}],
-    ["« Les règles sont intéressantes lorsqu'elles permettent de garantir la sécurité du patient. »", {pv:2}],
-    ["« Je préfère avoir des objectifs clairs mais pouvoir décider comment les atteindre. »", {bd:1, mkt:1}] ]},
+    ["« Les règles sont intéressantes lorsqu'elles permettent de garantir la sécurité du produit. »", {aq:2}],
+    ["« J'ai des objectifs clairs mais j'aime décider de comment les atteindre. »", {bd:1, mkt:1}] ]},
   { t: "Le médicament est commercialisé", q: "Le médicament est maintenant disponible pour les patients. Quelle mission t'intéresserait le plus ?", a: [
     ["Continuer à étudier son efficacité et son comportement chez les patients.", {rd:1, data:1}],
-    ["Surveiller les effets indésirables et rechercher d'éventuels signaux de sécurité.", {pv:2}],
+    ["Aucune réponse", {}],
     ["Suivre les données scientifiques et réglementaires pour maintenir son autorisation.", {reg:2}],
     ["Analyser son utilisation et son impact économique dans le système de santé.", {mkt:2}],
     ["Développer sa stratégie commerciale et son positionnement.", {bd:2, mkt:1}] ]},
   { t: "Le produit doit être distribué", q: "Un médicament doit être livré dans des centaines de pharmacies. Quelle problématique t'intéresse le plus ?", a: [
-    ["Optimiser les stocks et les flux de produits.", {distrib:2}],
+    ["Aucune réponse", {}],
     ["Garantir le respect des conditions de conservation et de transport.", {aq:1, cq:1}],
     ["Organiser efficacement les commandes et les approvisionnements.", {distrib:2}],
     ["Développer les relations avec les pharmacies et les laboratoires.", {bd:2, distrib:1}],
     ["Analyser les données de distribution pour optimiser le système.", {data:2}] ]},
   { t: "Une nouvelle technologie arrive", q: "Une biotech développe une technologie très prometteuse. Ton entreprise envisage de travailler avec elle. Quelle mission t'attire le plus ?", a: [
     ["Évaluer scientifiquement la technologie.", {rd:2}],
-    ["Étudier les données disponibles et son potentiel.", {data:2}],
+    ["Étudier la sécurité du process industriel.", {prod:2}],
     ["Négocier les conditions du partenariat.", {bd:2}],
     ["Évaluer son intérêt économique et stratégique.", {mkt:1, bd:1}],
     ["Déterminer les implications réglementaires et scientifiques du projet.", {reg:2}] ]},
@@ -319,8 +320,8 @@ const QUESTIONS = [
     ["Déterminer comment positionner le médicament face à ses concurrents.", {mkt:2}],
     ["Étudier les données médico-économiques et l'impact sur le système de santé.", {mkt:1, data:1}],
     ["Préparer les éléments nécessaires à son accès au marché.", {mkt:1, reg:1}],
-    ["Développer les relations avec les partenaires et les différents acteurs.", {bd:2}],
-    ["Vérifier la conformité des premiers lots commerciaux avant leur libération.", {cq:2, aq:1}] ]},
+    ["Développer les relations avec les partenaires et les différents professionnels de santé.", {bd:2}],
+    ["Vérifier la conformité des premiers lots pilotes avant leur libération.", {cq:2, aq:1}] ]},
   { t: "La question finale", q: "Imagine ton futur professionnel. Quelle phrase te correspond le plus ?", a: [
     ["🔬 « Je veux participer à la découverte et au développement des médicaments de demain. »", {rd:3}],
     ["🧪 « Je veux garantir que les médicaments produits sont fiables, conformes et de qualité. »", {cq:2, aq:2}],
@@ -335,7 +336,7 @@ const QUESTIONS = [
 
 /* ====================== moteur du quiz (pas besoin d'y toucher) ====================== */
 const KEYS = Object.keys(DOMAINS);
-const MAX = Object.fromEntries(KEYS.map(k => [k, QUESTIONS.reduce((s, qu) => s + Math.max(0, ...qu.a.map(o => o[1][k] || 0)), 0)]));
+const MAX = Object.fromEntries(KEYS.map(k => [k, QUESTIONS.reduce((s, qu) => s + Math.max(0, ...qu.a.map(o => (o[1] || {})[k] || 0)), 0)]));
 /* Dénominateur plancher : un domaine couvert par peu de questions ne doit pas monter trop facilement à 100 %. */
 const FLOOR = 14;
 const DEN = Object.fromEntries(KEYS.map(k => [k, Math.max(MAX[k], FLOOR)]));
@@ -375,7 +376,7 @@ function question(){
 
 function score(){
   const raw = Object.fromEntries(KEYS.map(k => [k, 0]));
-  answers.forEach((oi, qi) => { const o = QUESTIONS[qi].a[oi]; for (const k in o[1]) raw[k] += o[1][k]; });
+  answers.forEach((oi, qi) => { const o = QUESTIONS[qi].a[oi]; const pts = o[1] || {}; for (const k in pts) raw[k] += pts[k]; });
   return KEYS.map(k => ({k, pct: DEN[k] ? Math.round(100 * raw[k] / DEN[k]) : 0, raw: raw[k]}))
              .sort((a, b) => b.pct - a.pct || b.raw - a.raw);
 }
@@ -383,7 +384,7 @@ function score(){
 function result(){
   const s = score(), d = DOMAINS[s[0].k], d2 = DOMAINS[s[1].k];
   const hybrid = s[0].pct - s[1].pct <= 8;
-  if (!sent) { sent = true; sendStats(s[0].k, s[1].k); }
+  if (!sent) { sent = true; sendStats(s[0], s[1]); }
   app.innerHTML = `<section class="screen" style="display:flex;flex-direction:column;gap:18px">
     <div class="hero">
       <span class="pct">TON DOMAINE · ${s[0].pct}&nbsp;% DE CORRESPONDANCE</span>
@@ -426,12 +427,14 @@ function links(d, compact){
     <ul class="lk">${list.map(([label, url, src]) => `<li><a href="${esc(url)}" target="_blank" rel="noopener"><span class="src">${esc(src)}</span>${esc(label)}<span aria-hidden="true"> ↗</span></a></li>`).join("")}</ul></div>`;
 }
 
-function sendStats(k1, k2){
+function sendStats(r1, r2){
   if (!STATS.formUrl || !STATS.entryDomain) return;
   try {
     const body = new URLSearchParams();
-    body.append(STATS.entryDomain, DOMAINS[k1].name);
-    if (STATS.entrySecond) body.append(STATS.entrySecond, DOMAINS[k2].name);
+    body.append(STATS.entryDomain, DOMAINS[r1.k].name);
+    if (STATS.entryPct) body.append(STATS.entryPct, r1.pct);
+    if (STATS.entrySecond) body.append(STATS.entrySecond, DOMAINS[r2.k].name);
+    if (STATS.entrySecondPct) body.append(STATS.entrySecondPct, r2.pct);
     fetch(STATS.formUrl, {method:"POST", mode:"no-cors", body}).catch(() => {});
   } catch (e) {}
 }
